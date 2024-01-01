@@ -1,17 +1,8 @@
 const puppeteer = require('puppeteer');
 const cheerio = require('cheerio');
 const express = require("express");
+const {clearStr} = require("./utils");
 const router = express.Router()
-
-
-/**
- * 去除字符串前后空格和换行符
- * @param val
- * @returns {*}
- */
-const clearStr = (val) => {
-    return val.replace(/^\s+/,"").replace(/\s+$/,"").replace(/[\r\n]/g,"")
-}
 
 router.get("/", async (req, res) => {
     //创建一个Browser浏览器实例，并设置相关参数

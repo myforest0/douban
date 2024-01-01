@@ -1,6 +1,7 @@
 const puppeteer = require('puppeteer');
 const cheerio = require('cheerio');
 const express = require("express");
+const {clearStr} = require("./utils");
 const router = express.Router()
 
 router.get("/video_play_url", async (req, res) => {
@@ -17,43 +18,63 @@ router.get("/video_play_url", async (req, res) => {
     const page = await browser.newPage();
     //跳转JD首页
     await page.goto(url);
-    //等待元素加载成功
-    await page.waitForSelector('.bs li', {timeout: 10000});
-    //获取元素innerText属性
-    const list = await page.$$eval('.bs li', eles => eles.map(ele => ele.innerHTML));
-
+    // 获取播放源
     const episodeMapList = []
+    try {
+        //等待元素加载成功
+        await page.waitForSelector('.bs li', {timeout: 10000});
+        //获取元素innerText属性
+        const list = await page.$$eval('.bs li', eles => eles.map(ele => ele.innerHTML));
+        for (let i = 0; i < list.length; i++) {
+            const $ = cheerio.load(list[i])
 
-    for (let i = 0; i < list.length; i++) {
-        const $ = cheerio.load(list[i])
+            await page.click(`.bs li:nth-child(${i + 1}) a`)
 
-        await page.click(`.bs li:nth-child(${i + 1}) a`)
+            await page.waitForSelector('#tv-play-source .episode-list a');
 
-        await page.waitForSelector('#tv-play-source .episode-list a');
+            let episodeList = await page.$$eval("#tv-play-source .episode-list a", eles => eles.map(ele => ele.outerHTML))
 
-        let episodeList = await page.$$eval("#tv-play-source .episode-list a", eles => eles.map(ele => ele.outerHTML))
+            episodeList = episodeList.map(el => {
 
-        episodeList = episodeList.map(el => {
+                const $ = cheerio.load(el)
 
-            const $ = cheerio.load(el)
-
-            return {
-                href: decodeURIComponent($("a").attr("href").replace("https://www.douban.com/link2/?url=", "")),
-                text: $("a").text(),
-            }
-        })
+                return {
+                    href: decodeURIComponent($("a").attr("href").replace("https://www.douban.com/link2/?url=", "")),
+                    text: $("a").text(),
+                }
+            })
 
 
-        episodeMapList.push({
-            episodeList,
-            dataCn: $("a.playBtn").attr("data-cn"),
-        })
+            episodeMapList.push({
+                episodeList,
+                dataCn: $("a.playBtn").attr("data-cn"),
+            })
+        }
+        // console.log('episodeMapList', JSON.stringify(episodeMapList))
+    }catch (e) {
+        console.log('播放源为空', e)
     }
-    // console.log('episodeMapList', JSON.stringify(episodeMapList))
+
+    await page.waitForSelector('.more-actor', {timeout: 10000});
+    await page.click(".more-actor")
+    await page.waitForSelector('#content', {timeout: 10000});
+    const data = await page.$eval('#content', el => el.innerHTML);
+
+    const $ = cheerio.load(data);
+
     res.send({
         code: 0,
         msg: null,
-        data: episodeMapList
+        data: {
+            title: clearStr($("h1 span[property=v\\:itemreviewed]").text()),
+            year: clearStr($("h1 .year").text().replace(/[()]/g, "")),
+            href: $("#mainpic a.nbgnbg").attr("href"),
+            img: $("#mainpic a img").attr("src"),
+            info: $("#info").text().split("\n").map((item)=> clearStr(item).replace("更多...", "")).filter(item => !!item),
+            rating_num: $(".rating_num").text(),
+            desc: clearStr($("#link-report-intra span[property=v\\:summary]").text().split("\n").filter(item => !!clearStr(item))[0]),
+            episodeMapList
+        }
     })
 
     await browser.close()
