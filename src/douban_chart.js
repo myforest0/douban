@@ -18,7 +18,7 @@ router.get("/", async (req, res) => {
     const browser = await puppeteer.launch({
         headless: true,
         defaultViewport: null,
-        args: ['--start-maximized'],
+        args: ['--start-maximized','--no-sandbox'],
         ignoreDefaultArgs: ['--enable-automation']
     });
     //创建一个Page实例
