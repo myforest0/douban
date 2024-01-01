@@ -10,7 +10,7 @@ router.get("/video_play_url", async (req, res) => {
     const browser = await puppeteer.launch({
         headless: true,
         defaultViewport: null,
-        args: ['--start-maximized','--no-sandbox'],
+        args: ['--start-maximized', '--no-sandbox'],
         ignoreDefaultArgs: ['--enable-automation']
     });
     //创建一个Page实例
@@ -27,7 +27,7 @@ router.get("/video_play_url", async (req, res) => {
     for (let i = 0; i < list.length; i++) {
         const $ = cheerio.load(list[i])
 
-        page.click(`.bs li:nth-child(${i + 1}) a`)
+        await page.click(`.bs li:nth-child(${i + 1}) a`)
 
         await page.waitForSelector('#tv-play-source .episode-list a');
 

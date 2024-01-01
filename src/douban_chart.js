@@ -72,7 +72,7 @@ router.get("/", async (req, res) => {
         }
     })
 
-    browser.close()
+    await browser.close()
 })
 
 module.exports = router
