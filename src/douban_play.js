@@ -86,7 +86,7 @@ router.get("/play_url", async (req, res) => {
     res.send({
         code: 0,
         msg: null,
-        data: data?.data
+        data: data.data
     })
 })
 
