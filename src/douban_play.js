@@ -6,7 +6,7 @@ const router = express.Router()
 
 router.get("/video_play_url", async (req, res) => {
     //"https://movie.douban.com/subject/34825964/"
-    const {url} = req.query
+    const {id} = req.query
     //创建一个Browser浏览器实例，并设置相关参数
     const browser = await puppeteer.launch({
         headless: true,
@@ -17,7 +17,7 @@ router.get("/video_play_url", async (req, res) => {
     //创建一个Page实例
     const page = await browser.newPage();
     //跳转JD首页
-    await page.goto(url);
+    await page.goto('https://movie.douban.com/subject/'+id);
     // 获取播放源
     const episodeMapList = []
     try {
