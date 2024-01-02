@@ -1,7 +1,7 @@
 const puppeteer = require('puppeteer');
 const cheerio = require('cheerio');
 const express = require("express");
-const {clearStr, getQMark} = require("./utils");
+const {clearStr, delQuery} = require("./utils");
 const axios = require("axios");
 const router = express.Router()
 
@@ -40,7 +40,7 @@ router.get("/video_play_url", async (req, res) => {
                 const $ = cheerio.load(el)
 
                 return {
-                    href: getQMark(decodeURIComponent($("a").attr("href").replace("https://www.douban.com/link2/?url=", ""))),
+                    href: delQuery(decodeURIComponent($("a").attr("href").replace("https://www.douban.com/link2/?url=", ""))),
                     text: $("a").text(),
                 }
             })
@@ -82,7 +82,7 @@ router.get("/video_play_url", async (req, res) => {
 })
 
 router.get("/play_url", async (req, res) => {
-    const data = await axios('https://m3u8.co/?url=' + req?.query?.url)
+    const data = await axios('https://m3u8.co/?url=' + req.query.url)
     res.send({
         code: 0,
         msg: null,

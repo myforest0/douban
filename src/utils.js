@@ -8,14 +8,13 @@ const clearStr = (val) => {
 }
 
 /**
- * 截取？后面的参数
+ * 替换？后面的参数
  * @param my_url
  * @returns {*}
  */
-function getQMark(my_url){
-//如果url带问号
-    var qMark = my_url;
-    if(my_url.indexOf("?") != -1){
+function delQuery(my_url){
+    let qMark = my_url;
+    if(my_url.indexOf("?") !== -1){
         qMark = my_url.split("?")[0];
     }
     return qMark;
@@ -23,5 +22,5 @@ function getQMark(my_url){
 
 module.exports = {
     clearStr,
-    getQMark
+    delQuery
 }
