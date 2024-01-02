@@ -2,6 +2,7 @@ const puppeteer = require('puppeteer');
 const cheerio = require('cheerio');
 const express = require("express");
 const {clearStr, getQMark} = require("./utils");
+const axios = require("axios");
 const router = express.Router()
 
 router.get("/video_play_url", async (req, res) => {
@@ -17,7 +18,7 @@ router.get("/video_play_url", async (req, res) => {
     //创建一个Page实例
     const page = await browser.newPage();
     //跳转JD首页
-    await page.goto('https://movie.douban.com/subject/'+id);
+    await page.goto('https://movie.douban.com/subject/' + id);
     // 获取播放源
     const episodeMapList = []
     try {
@@ -51,7 +52,7 @@ router.get("/video_play_url", async (req, res) => {
             })
         }
         // console.log('episodeMapList', JSON.stringify(episodeMapList))
-    }catch (e) {
+    } catch (e) {
         console.log('播放源为空', e)
     }
 
@@ -70,7 +71,7 @@ router.get("/video_play_url", async (req, res) => {
             year: clearStr($("h1 .year").text().replace(/[()]/g, "")),
             href: $("#mainpic a.nbgnbg").attr("href"),
             img: $("#mainpic a img").attr("src"),
-            info: $("#info").text().split("\n").map((item)=> clearStr(item).replace("更多...", "")).filter(item => !!item),
+            info: $("#info").text().split("\n").map((item) => clearStr(item).replace("更多...", "")).filter(item => !!item),
             rating_num: $(".rating_num").text(),
             desc: clearStr($("#link-report-intra span[property=v\\:summary]").text().split("\n").filter(item => !!clearStr(item))[0]),
             episodeMapList
@@ -78,6 +79,15 @@ router.get("/video_play_url", async (req, res) => {
     })
 
     await browser.close()
+})
+
+router.get("/play_url", async (req, res) => {
+    const data = await axios('https://m3u8.co/?url=' + req?.query?.url)
+    res.send({
+        code: 0,
+        msg: null,
+        data: data?.data
+    })
 })
 
 module.exports = router
