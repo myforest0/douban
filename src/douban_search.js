@@ -30,6 +30,7 @@ router.get("/pc", async (req, res) => {
 
         resMapList.push({
             href: $('a.cover-link').attr('href'),
+            id: $('a.cover-link').attr('href').split("/").splice(3,4)[0],
             img: $('a.cover-link img').attr('src'),
             title: $('.detail .title-text').text(),
             label: $('.detail .label').text(),
@@ -80,6 +81,7 @@ router.get("/m", async (req, res) => {
             img: $('a img').attr('src'),
             title: $('.subject-info .subject-title').text(),
             rating: clearStr($(".subject-info .rating").text()),
+            id:  $('a').attr('href').split("/").slice(3,4)[0],
         })
     }
     res.send({

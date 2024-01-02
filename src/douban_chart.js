@@ -31,6 +31,7 @@ router.get("/", async (req, res) => {
             no: $('.no').text(),
             name: clearStr($(".name a").text()),
             href: $(".name a").attr('href'),
+            id: $(".name a").attr('href').split("/").slice(3,4)[0]
         })
 
 
@@ -50,9 +51,8 @@ router.get("/", async (req, res) => {
             info: $(".pl2 p.pl").text(),
             rating_nums: $(".star .rating_nums").text(),
             rating_count: $(".star .pl").text(),
+            id: $("a.nbg").attr('href').split("/").slice(3,4)[0]
         })
-
-
     }
     res.send({
         code: 0,
