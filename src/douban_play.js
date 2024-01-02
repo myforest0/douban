@@ -1,7 +1,7 @@
 const puppeteer = require('puppeteer');
 const cheerio = require('cheerio');
 const express = require("express");
-const {clearStr} = require("./utils");
+const {clearStr, getQMark} = require("./utils");
 const router = express.Router()
 
 router.get("/video_play_url", async (req, res) => {
@@ -39,7 +39,7 @@ router.get("/video_play_url", async (req, res) => {
                 const $ = cheerio.load(el)
 
                 return {
-                    href: decodeURIComponent($("a").attr("href").replace("https://www.douban.com/link2/?url=", "")),
+                    href: getQMark(decodeURIComponent($("a").attr("href").replace("https://www.douban.com/link2/?url=", ""))),
                     text: $("a").text(),
                 }
             })
